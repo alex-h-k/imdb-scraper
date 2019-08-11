@@ -1,29 +1,14 @@
-const fetch = require("node-fetch");
-const cheerio = require("cheerio");
+const express = require("express");
 
-const url = "https://www.imdb.com/find?ref_=nv_sr_fn&q=";
+const app = express();
 
-function searchMovies(searchTerm) {
-  return fetch(`${url}${searchTerm}`)
-    .then(response => response.text())
-    .then(body => {
-      const movies = [];
-      const $ = cheerio.load(body);
-      $(".findResult").each((i, element) => {
-        const $element = $(element);
-        const $image = $element.find("td a img");
-        const $title = $element.find("td.result_text a");
-        const movie = {
-          image: $image.attr("src"),
-          title: $title.text()
-        };
-        movies.push(movie);
-      });
+app.get("/", (req, res) => {
+  res.json({
+    message: "Alex is learning Web Scraper!"
+  });
+});
 
-      return movies;
-    });
-}
-
-module.exports = {
-  searchMovies
-};
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Listening on ${port}`);
+});
