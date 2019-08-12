@@ -1,10 +1,22 @@
 const express = require("express");
+const scraper = require("./scraper");
 
 const app = express();
 
 app.get("/", (req, res) => {
   res.json({
     message: "Alex is learning Web Scraper!"
+  });
+});
+
+app.get("/search/:title", (req, res) => {
+  scraper.searchMovies(req.params.title).then(movies => {
+    res.json(movies);
+  });
+});
+app.get("/movie/:imdbID", (req, res) => {
+  scraper.getMovie(req.params.imdbID).then(movie => {
+    res.json(movie);
   });
 });
 

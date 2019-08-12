@@ -1,21 +1,27 @@
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-const url = "https://www.imdb.com/find?ref_=nv_sr_fn&q=";
-
+const searchUrl = "https://www.imdb.com/find?ref_=nv_sr_fn&q=";
+const movieUrl = "https://www.imdb.com/title/";
 function searchMovies(searchTerm) {
-  return fetch(`${url}${searchTerm}`)
+  return fetch(`${searchUrl}${searchTerm}`)
     .then(response => response.text())
     .then(body => {
       const movies = [];
       const $ = cheerio.load(body);
       $(".findResult").each((i, element) => {
         const $element = $(element);
-        const $image = $element.find("td a img");
-        const $title = $element.find("td.result_text a");
+        const $image = $element.find("table.findList td a img");
+        const $title = $element.find("table.findList td.result_text a");
+        const imdbID = ($title.attr("href").match(/title\/(.*)\//) || [
+          "",
+          "none"
+        ])[1];
+        console.log($title.text());
         const movie = {
           image: $image.attr("src"),
-          title: $title.text()
+          title: $title.text(),
+          imdbID
         };
         movies.push(movie);
       });
@@ -24,6 +30,18 @@ function searchMovies(searchTerm) {
     });
 }
 
+function getMovie(imdbID) {
+  return fetch(`${movieUrl}${imdbID}`)
+    .then(res => {
+      res.text();
+    })
+    .then(body => {
+      console.log(body);
+      return body;
+    });
+}
+
 module.exports = {
-  searchMovies
+  searchMovies,
+  getMovie
 };
